@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zahlung eingegangen</title>
+  <style>
+    :root { --bg:#f6f7f9; --fg:#1f2328; --ok:#1a7f37; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      min-height: 100dvh; display: grid; place-items: center; padding: 24px;
+    }
+    .card {
+      width: min(520px, 92vw);
+      background: #fff; border-radius: 14px; padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08); text-align: center;
+    }
+    .amount { font-size: 2rem; margin: 8px 0 2px; color: var(--ok); }
+    .muted { color:#6b7280; margin: 0; }
+    .check { font-size: 44px; line-height: 1; margin-bottom: 8px; }
+    .fade { opacity: 0; transition: opacity .5s ease; }
+    .fade.show { opacity: 1; }
+    img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+    .hint { font-size: 12px; color:#9aa0a6; margin-top: 12px; }
+    .err  { color:#b91c1c; font-size: 14px; margin-top: 8px; display:none; }
+    .err.show { display:block; }
+  </style>
+</head>
+<body>
+  <div class="card" id="stage1">
+    <div class="check">✅</div>
+    <h1>Zahlung eingegangen</h1>
+    <div class="amount">+ 200,00&nbsp;€</div>
+    <p class="muted">Vorgang wird bestätigt …</p>
+  </div>
+
+  <div class="card fade" id="stage2" aria-hidden="true">
+    <h2>😂 Haha, verarscht!</h2>
+    <img id="prankImg" alt="Spaßbild wird geladen …" loading="eager">
+    <p class="err" id="imgErr">Konnte das Bild nicht laden 😅</p>
+    <p class="hint">Alles nur Spaß. Keine echte Zahlung.</p>
+  </div>
+
+  <script>
+    (function () {
+      const params  = new URLSearchParams(location.search);
+      const imgUrl  = params.get("img");
+      const fallback = "https://picsum.photos/800/500?blur=1"; // sicheres HTTPS-Fallback
+
+      const stage1 = document.getElementById("stage1");
+      const stage2 = document.getElementById("stage2");
+      const prankImg = document.getElementById("prankImg");
+      const imgErr = document.getElementById("imgErr");
+
+      // Bild setzen (sofort)
+      const toShow = imgUrl || fallback;
+      prankImg.src = toShow;
+
+      // Fehler auffangen – aber unabhängig davon nach 2s umschalten
+      prankImg.addEventListener("error", () => {
+        imgErr.classList.add("show");
+        prankImg.style.display = "none";
+      });
+
+      // Garantierter Switch nach 2s
+      setTimeout(() => {
+        stage1.style.display = "none";
+        stage2.setAttribute("aria-hidden", "false");
+        stage2.classList.add("show");
+      }, 2000);
+    })();
+  </script>
+</body>
+</html>
